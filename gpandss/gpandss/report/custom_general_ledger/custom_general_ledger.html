@@ -1,0 +1,83 @@
+
+<style>
+	.tab th, .tab td {
+		border: 1px solid black;
+		padding: 2px !important;
+		border-collapse: collapse;
+		width:auto
+		margin:3px
+	}
+	.color {
+			background-color: rgb(188, 229, 238);
+	}
+</style>
+
+
+
+
+<table class="tab" width="100%" style="border:none">
+	<tr>
+		<td colspan="10" style="border:none">
+			<p style="font-size:27px;text-align:center;"><b>Sarve Sai Edible Oils Pvt Ltd<br> Farmer Statement</b></p>
+			<p style="font-size:20px;text-align:center;"><b>{{ filters.branch_address_list  }}</b></p>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="6"  style="border:none">Party Type:{{ filters.party_type }}</td>
+		<td colspan="4" style="border:none">Party ID :{{ filters.party }}</td>
+	</tr>
+	<tr>
+		<td colspan="10" style="border:none"> Party Name : {{ filters.party_name }}</td>
+	</tr>
+	<tr>
+		<td colspan="6" style="border:none">Branch : {{ filters.branch }}</td>
+		<td colspan="2" style="border:none">From Date : {%= frappe.datetime.str_to_user(filters.from_date) %}</td>
+		<td colspan="2" style="border:none">To Date. : {%= frappe.datetime.str_to_user(filters.to_date) %}</td>
+	</tr>
+</table>
+<hr>
+
+<table class="tab">
+	<thead>
+		<tr>
+			<th style="width: 7%" class="color">{%= __("Date") %}</th>
+			<th style="width: 10%" class="color">{%= __("Voucher Type") %}</th>
+			<th style="width: 10%" class="color">{%= __("Voucher No") %}</th>
+			<th style="width: 20%" class="color">{%= __("Account") %}</th>
+			<th style="width: 10%" class="color text-right">{%= __("Total Qty") %}</th>
+			<th style="width: 10%" class="color text-right">{%= __("Debit") %}</th>
+			<th style="width: 10%" class="color text-right">{%= __("Credit") %}</th>
+			<th style="width: 10%" class="color text-right">{%= __("Rate") %}</th>
+			<th style="width: 5%" class="color text-right">{%= __("Dr/Cr") %}</th>
+			<th style="width: 18%" class="color text-right">{%= __("(Dr - Cr)") %}</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for row in data %}
+			<tr style="height: 30px">
+				<td>{{ row.posting_date || "" }}</td>
+				<td>{{ row.voucher_type || "" }}</td>
+				<td>{{ row.voucher_no || "" }}</td>
+				<td>{% if row.against == "Stock Received But Not Billed - SS" %} FFB Account {% else %}{{ frappe.format(row.against,{fieldtype:"Data"}) }}{% endif %}</td>
+				<td class="text-right">{% if row.total_qty %} {{ frappe.format(row.total_qty, {fieldtype: "Float"}) }} {% else %} {% endif %}</td>
+				<td class="text-right">{% if row.debit %} {{ frappe.format(row.debit, {fieldtype: "Currency"}) }} {% else %}  {% endif %}</td>
+				<td class="text-right">{% if row.credit %} {{ frappe.format(row.credit, {fieldtype: "Currency"}) }} {% else %} {% endif %}</td>
+				<td class="text-right">{% if row.total_qty %} {{ frappe.format(row.debit/row.total_qty, {fieldtype: "Currency"}) }} {% else %}   {% endif %}</td>
+				<td>{% if (row.credit) %} Cr {% else %} Dr {% endif %}</td>
+				<td class="text-right">{% if row.balance %}{{ frappe.format(row.balance, {fieldtype: "Currency"}) }} {% else %} {% endif %}</td>
+			</tr>
+
+		{% endfor %}
+	</tbody>
+	<tr style="height: 30px;">
+			<td colspan="5" style="padding-left:20px !important;padding-top:60px !important;vertical-align:bottom !important;"> Verified By</td>
+			<td colspan="5" style="text-align: right;padding-right:20px !important;padding-top:60px !important;vertical-align: bottom !important;"> Approved By</td>
+		</tr>
+</table>
+
+
+
+
+
+
