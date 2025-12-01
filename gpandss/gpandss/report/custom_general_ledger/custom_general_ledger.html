@@ -56,14 +56,14 @@
 	<tbody>
 		{% for row in data %}
 			<tr style="height: 30px">
-				<td>{{ row.posting_date || "" }}</td>
+				<td> {%= frappe.datetime.str_to_user(row.posting_date) %}</td>
 				<td>{{ row.voucher_type || "" }}</td>
 				<td>{{ row.voucher_no || "" }}</td>
-				<td>{% if row.against == "Stock Received But Not Billed - SS" %} FFB Account {% else %}{{ frappe.format(row.against,{fieldtype:"Data"}) }}{% endif %}</td>
+				<td>{% if not row.against  %} Price Adjustment {% else %}{{ frappe.format(row.against,{fieldtype:"Data"}) }}{% endif %}</td>
 				<td class="text-right">{% if row.total_qty %} {{ frappe.format(row.total_qty, {fieldtype: "Float"}) }} {% else %} {% endif %}</td>
 				<td class="text-right">{% if row.debit %} {{ frappe.format(row.debit, {fieldtype: "Currency"}) }} {% else %}  {% endif %}</td>
 				<td class="text-right">{% if row.credit %} {{ frappe.format(row.credit, {fieldtype: "Currency"}) }} {% else %} {% endif %}</td>
-				<td class="text-right">{% if row.total_qty %} {{ frappe.format(row.debit/row.total_qty, {fieldtype: "Currency"}) }} {% else %}   {% endif %}</td>
+				<td class="text-right">{% if row.total_qty %} {{ frappe.format(row.credit/row.total_qty, {fieldtype: "Currency"}) }} {% else %}   {% endif %}</td>
 				<td>{% if (row.credit) %} Cr {% else %} Dr {% endif %}</td>
 				<td class="text-right">{% if row.balance %}{{ frappe.format(row.balance, {fieldtype: "Currency"}) }} {% else %} {% endif %}</td>
 			</tr>

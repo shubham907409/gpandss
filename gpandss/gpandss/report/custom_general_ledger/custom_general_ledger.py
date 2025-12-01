@@ -148,16 +148,43 @@ def set_account_currency(filters):
 
 def get_result(filters, account_details):
 	accounting_dimensions = []
+	
 	if filters.get("include_dimensions"):
 		accounting_dimensions = get_accounting_dimensions()
 
 	gl_entries = get_gl_entries(filters, accounting_dimensions)
+
+# adding total qty of purchase invoice
+	pi_qty_map = get_purchase_invoice_qty()
+
+	for gl in gl_entries:
+		if gl.voucher_type == "Purchase Invoice":
+			gl["total_qty"] = pi_qty_map.get(gl.voucher_no, 0)
+		else:
+			gl["total_qty"] = 0
 
 	data = get_data_with_opening_closing(filters, account_details, accounting_dimensions, gl_entries)
 
 	result = get_result_as_list(data, filters)
 
 	return result
+
+
+
+# add total qty of purchase invoice
+def get_purchase_invoice_qty():
+		qty_map = {}
+		result = frappe.db.sql("""
+			SELECT parent, SUM(qty) as total_qty
+			FROM `tabPurchase Invoice Item`
+			GROUP BY parent
+		""", as_dict=1)
+
+		for r in result:
+			qty_map[r.parent] = r.total_qty
+
+		return qty_map
+
 
 
 def get_gl_entries(filters, accounting_dimensions):
@@ -618,6 +645,12 @@ def get_columns(filters):
 			"width": 130,
 		},
 		{"label": _("Voucher Type"), "fieldname": "voucher_type", "width": 120},
+			{
+				"label": _("Total Qty"),
+				"fieldname": "total_qty",
+				"fieldtype": "Float",
+				"width": 120
+			},
 		{
 			"label": _("Voucher No"),
 			"fieldname": "voucher_no",
@@ -654,6 +687,10 @@ def get_columns(filters):
 			{"label": _("Supplier Invoice No"), "fieldname": "bill_no", "fieldtype": "Data", "width": 100},
 		]
 	)
+
+
+
+	
 
 	if filters.get("show_remarks"):
 		columns.extend([{"label": _("Remarks"), "fieldname": "remarks", "width": 400}])
